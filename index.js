@@ -41,8 +41,10 @@ cron.schedule('*/10 * * * * *', () => {
         if (newMargingSelected == false) {
             if (DateTime.now().day !== todayDay) {
                 setRangeTime(0);
+                updateTimestampLastCall();
             } else {
                 setRangeTime(1);
+                updateTimestampLastCall();
             }
         }
     }
