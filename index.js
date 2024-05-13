@@ -20,10 +20,10 @@ var countLive = 0;
 var newMargingSelected = false;
 
 var latest = DateTime.now();
-setRangeTime(0);
 fetchRangeTime()
 
 cron.schedule('*/10 * * * * *', () => {
+    console.log(matchTimeStart, keepLive)
     if (DateTime.now() > matchTimeStart && keepLive) {
         newMargingSelected = false;
         updateLive(0).then(() => {
