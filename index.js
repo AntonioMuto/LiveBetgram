@@ -23,7 +23,6 @@ var latest = DateTime.now();
 fetchRangeTime()
 
 cron.schedule('*/10 * * * * *', () => {
-    console.log(matchTimeStart, keepLive)
     if (DateTime.now() > matchTimeStart && keepLive) {
         newMargingSelected = false;
         updateLive(0).then(() => {
