@@ -19,6 +19,8 @@ var matchTimeEnd = undefined;
 var countLive = 0;
 var newMargingSelected = false;
 
+var latest = DateTime.now();
+setRangeTime(0);
 fetchRangeTime()
 
 cron.schedule('*/10 * * * * *', () => {
@@ -26,14 +28,15 @@ cron.schedule('*/10 * * * * *', () => {
         newMargingSelected = false;
         updateLive(0).then(() => {
             if (Object.keys(matchHashMap).length !== 0) {
+                latest = DateTime.now();
                 saveData(matchHashMap);
+                updateTimestampLastCall();
             }
             differenceArray = [];
             diffSize = false;
-        })
-            .catch((error) => {
-                console.error('Errore nell\'aggiornamento dei dati:', error);
-            });
+        }).catch((error) => {
+            console.error('Errore nell\'aggiornamento dei dati:', error);
+        });
     } else {
         countLive = 0;
         if (newMargingSelected == false) {
@@ -47,6 +50,27 @@ cron.schedule('*/10 * * * * *', () => {
 }, {
     timezone: "Europe/Rome"
 });
+
+
+async function updateTimestampLastCall() {
+    let urlTimestamp = process.env.TIMESTAMPURL;
+
+    let dataTime = {
+        log: DateTime.now()
+    }
+
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+
+    axios.put(urlTimestamp, dataTime, config)
+        .then(response => {
+        })
+        .catch(error => {
+        });
+}
 
 async function saveData(matchHashMap) {
     const url = process.env.LIVEURL;
@@ -67,10 +91,8 @@ async function saveData(matchHashMap) {
 
         axios.put(url, gzipData, config)
             .then(response => {
-                console.log('Risposta: 200');
             })
             .catch(error => {
-                console.error('ERRORE');
             });
     })
 }
@@ -80,7 +102,7 @@ async function updateLive(dayPlus) {
     matchHashMap = {};
     for (var i = 1; i < 20 && !end; i++) {
         await new Promise((resolve, reject) => {
-            const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.now().plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;lineups.player:common_name,image_path;events;statistics:data,participant_id;periods;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
+            const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.now().plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${process.env.TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;lineups.player:common_name,image_path;events;statistics:data,participant_id;periods;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
             request.get({ url }, (error, response, body) => {
                 if (error) {
                     console.error('Errore nella richiesta HTTP:', error);
@@ -123,7 +145,7 @@ async function setRangeTime(dayPlus) {
         (async () => {
             for (var i = 1; i < 20 && !endTime; i++) {
                 await new Promise((resolve, reject) => {
-                    const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.now().plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;comments;lineups.player:common_name,image_path;events;comments;statistics:data,participant_id;periods:time_added;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
+                    const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.now().plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${process.env.TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;comments;lineups.player:common_name,image_path;events;comments;statistics:data,participant_id;periods:time_added;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
                     request.get({ url }, (error, response, body) => {
                         if (error) {
                             console.error('Errore nella richiesta HTTP:', error);
@@ -169,7 +191,6 @@ async function setRangeTime(dayPlus) {
             };
             axios.put(url, jsonData, config)
                 .then(response => {
-                    console.log('Risposta Set: 200');
                     keepLive = true;
                     newMargingSelected = true;
                     let dayCheck = 0;
@@ -256,7 +277,7 @@ function refineResponse(match) {
         match.lineups[i].sport_id = undefined;
         match.lineups[i].fixture_id = undefined;
         match.lineups[i].id = undefined;
-        if(match.lineups[i].player != null){
+        if (match.lineups[i].player != null) {
             match.lineups[i].player.country_id = undefined;
             match.lineups[i].player.sport_id = undefined;
             match.lineups[i].player.city_id = undefined;
