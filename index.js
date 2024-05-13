@@ -72,6 +72,7 @@ async function updateTimestampLastCall() {
             console.log(response);
         })
         .catch(error => {
+            console.log("ERROR")
         });
 }
 
