@@ -10,24 +10,24 @@ const TOKEN = process.env.TOKEN;
 dotenv.config();
 
 var matchHashMap = {};
-dataNow = DateTime.local().setLocale('it');
+dataNow = DateTime.now().local().setLocale('it-IT');
 var replace = true;
 var keepLive = true;
-var todayDay = DateTime.local().setLocale('it').day;
+var todayDay = DateTime.now().local().setLocale('it-IT').day;
 var matchTimeStart = undefined;
 var matchTimeEnd = undefined;
 var countLive = 0;
 var newMargingSelected = false;
 
-var latest = DateTime.local().setLocale('it');
+var latest = DateTime.now().local().setLocale('it-IT');
 fetchRangeTime()
 
 cron.schedule('*/10 * * * * *', () => {
-    if (DateTime.local().setLocale('it') > matchTimeStart && keepLive) {
+    if (DateTime.now().local().setLocale('it-IT') > matchTimeStart && keepLive) {
         newMargingSelected = false;
         updateLive(0).then(() => {
             if (Object.keys(matchHashMap).length !== 0) {
-                latest = DateTime.local().setLocale('it');
+                latest = DateTime.now().local().setLocale('it-IT');
                 saveData(matchHashMap);
                 updateTimestampLastCall();
             }
@@ -39,7 +39,7 @@ cron.schedule('*/10 * * * * *', () => {
     } else {
         countLive = 0;
         if (newMargingSelected == false) {
-            if (DateTime.local().setLocale('it').day !== todayDay) {
+            if (DateTime.now().local().setLocale('it-IT').day !== todayDay) {
                 setRangeTime(0);
                 updateTimestampLastCall();
             } else {
@@ -57,7 +57,7 @@ async function updateTimestampLastCall() {
     let urlTimestamp = process.env.TIMESTAMPURL;
 
     let dataTime = {
-        log: DateTime.local().setLocale('it')
+        log: DateTime.now().local().setLocale('it-IT')
     }
 
     const config = {
@@ -103,7 +103,7 @@ async function updateLive(dayPlus) {
     matchHashMap = {};
     for (var i = 1; i < 20 && !end; i++) {
         await new Promise((resolve, reject) => {
-            const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.local().setLocale('it').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${process.env.TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;lineups.player:common_name,image_path;events;statistics:data,participant_id;periods;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
+            const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.now().local().setLocale('it-IT').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${process.env.TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;lineups.player:common_name,image_path;events;statistics:data,participant_id;periods;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
             request.get({ url }, (error, response, body) => {
                 if (error) {
                     console.error('Errore nella richiesta HTTP:', error);
@@ -139,14 +139,14 @@ var endTime = false;
 
 async function setRangeTime(dayPlus) {
     const formatoInput = "yyyy-MM-dd HH:mm:ss";
-    var orarioInizio = DateTime.fromFormat(`${DateTime.local().setLocale('it').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')} 23:59:00`, formatoInput);
-    var orarioFine = DateTime.fromFormat(`${DateTime.local().setLocale('it').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')} 00:00:00`, formatoInput);
+    var orarioInizio = DateTime.fromFormat(`${DateTime.now().local().setLocale('it-IT').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')} 23:59:00`, formatoInput);
+    var orarioFine = DateTime.fromFormat(`${DateTime.now().local().setLocale('it-IT').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')} 00:00:00`, formatoInput);
     var nessunMatch = true;
     return new Promise((resolve, reject) => {
         (async () => {
             for (var i = 1; i < 20 && !endTime; i++) {
                 await new Promise((resolve, reject) => {
-                    const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.local().setLocale('it').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${process.env.TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;comments;lineups.player:common_name,image_path;events;comments;statistics:data,participant_id;periods:time_added;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
+                    const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.now().local().setLocale('it-IT').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${process.env.TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;comments;lineups.player:common_name,image_path;events;comments;statistics:data,participant_id;periods:time_added;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
                     request.get({ url }, (error, response, body) => {
                         if (error) {
                             console.error('Errore nella richiesta HTTP:', error);
@@ -196,7 +196,7 @@ async function setRangeTime(dayPlus) {
                     newMargingSelected = true;
                     let dayCheck = 0;
                     dayPlus == 0 ? dayCheck = 1 : dayCheck = 0;
-                    const updMatchUrl = `http://${process.env.APIBETGRAM}/api/insert/match/${DateTime.local().setLocale('it').minus({ days: dayCheck }).toFormat('yyyy-MM-dd')}`;
+                    const updMatchUrl = `http://${process.env.APIBETGRAM}/api/insert/match/${DateTime.now().local().setLocale('it-IT').minus({ days: dayCheck }).toFormat('yyyy-MM-dd')}`;
                     axios.get(updMatchUrl)
                         .then((response) => {
                             updateLive(dayPlus).then(() => {
