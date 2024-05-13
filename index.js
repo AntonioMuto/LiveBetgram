@@ -68,6 +68,7 @@ async function updateTimestampLastCall() {
 
     axios.put(urlTimestamp, dataTime, config)
         .then(response => {
+            let res = response;
         })
         .catch(error => {
         });
