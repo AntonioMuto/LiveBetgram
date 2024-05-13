@@ -5,6 +5,7 @@ const cron = require('node-cron');
 const axios = require('axios');
 const zlib = require('zlib');
 const { start } = require('repl');
+DateTime.local().setLocale('it');
 
 const TOKEN = process.env.TOKEN;
 dotenv.config();
@@ -68,11 +69,8 @@ async function updateTimestampLastCall() {
 
     axios.put(urlTimestamp, dataTime, config)
         .then(response => {
-            console.log(dataTime);
-            console.log(response);
         })
         .catch(error => {
-            console.log(error)
         });
 }
 
