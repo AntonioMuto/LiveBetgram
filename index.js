@@ -220,8 +220,9 @@ async function setRangeTime(dayPlus) {
     });
 }
 
-
 function refineResponse(match) {
+    if (match == null) return match;
+
     match.venue = undefined;
     match.league = undefined;
     match.sport_id = undefined;
@@ -237,87 +238,100 @@ function refineResponse(match) {
     match.placeholder = undefined;
     match.has_odds = undefined;
     match.starting_at_timestamp = undefined;
-    match.round.id = undefined;
 
-    //ROUND
-    match.round.sport_id = undefined;
-    match.round.league_id = undefined;
-    match.round.season_id = undefined;
-    match.round.stage_id = undefined;
-
-    //COACHES
-    for (let i = 0; i < match.coaches.length; i++) {
-        match.coaches[i].player_id = undefined;
-        match.coaches[i].sport_id = undefined;
-        match.coaches[i].country_id = undefined;
-        match.coaches[i].meta = undefined;
+    if (match.round != null) {
+        match.round.id = undefined;
+        match.round.sport_id = undefined;
+        match.round.league_id = undefined;
+        match.round.season_id = undefined;
+        match.round.stage_id = undefined;
     }
 
-    for (let i = 0; i < match.participants.length; i++) {
-        match.participants[i].venue_id = undefined;
-        match.participants[i].sport_id = undefined;
-        match.participants[i].country_id = undefined;
-        match.participants[i].gender = undefined;
-        match.participants[i].founded = undefined;
-        match.participants[i].type = undefined;
-        match.participants[i].placeholder = undefined;
-        match.participants[i].last_played_at = undefined;
-    }
-
-    for (let i = 0; i < match.scores.length; i++) {
-        match.scores[i].fixture_id = undefined;
-        match.scores[i].id = undefined;
-    }
-
-    match.state.state = undefined;
-    match.state.name = undefined;
-    match.state.short_name = undefined;
-
-    for (let i = 0; i < match.lineups.length; i++) {
-        match.lineups[i].id = undefined;
-        match.lineups[i].sport_id = undefined;
-        match.lineups[i].fixture_id = undefined;
-        match.lineups[i].id = undefined;
-        if (match.lineups[i].player != null) {
-            match.lineups[i].player.country_id = undefined;
-            match.lineups[i].player.sport_id = undefined;
-            match.lineups[i].player.city_id = undefined;
+    if (Array.isArray(match.coaches)) {
+        for (let i = 0; i < match.coaches.length; i++) {
+            match.coaches[i].player_id = undefined;
+            match.coaches[i].sport_id = undefined;
+            match.coaches[i].country_id = undefined;
+            match.coaches[i].meta = undefined;
         }
     }
 
-    for (let i = 0; i < match.events.length; i++) {
-        match.events[i].fixture_id = undefined;
-        match.events[i].period_id = undefined;
-        match.events[i].section = undefined;
-        match.events[i].section = undefined;
+    if (Array.isArray(match.participants)) {
+        for (let i = 0; i < match.participants.length; i++) {
+            match.participants[i].venue_id = undefined;
+            match.participants[i].sport_id = undefined;
+            match.participants[i].country_id = undefined;
+            match.participants[i].gender = undefined;
+            match.participants[i].founded = undefined;
+            match.participants[i].type = undefined;
+            match.participants[i].placeholder = undefined;
+            match.participants[i].last_played_at = undefined;
+        }
     }
 
-    for (let i = 0; i < match.statistics.length; i++) {
-        match.statistics[i].fixture_id = undefined;
+    if (Array.isArray(match.scores)) {
+        for (let i = 0; i < match.scores.length; i++) {
+            match.scores[i].fixture_id = undefined;
+            match.scores[i].id = undefined;
+        }
     }
 
-    for (let i = 0; i < match.periods.length; i++) {
-        match.periods[i].fixture_id = undefined;
-        match.periods[i].started = undefined;
-        match.periods[i].id = undefined;
-        match.periods[i].ended = undefined;
-        match.periods[i].counts_from = undefined;
-        match.periods[i].ticking = undefined;
-        match.periods[i].has_timer = undefined;
+    if (match.state != null) {
+        match.state.state = undefined;
+        match.state.name = undefined;
+        match.state.short_name = undefined;
     }
 
-    for (let i = 0; i < match.metadata.length; i++) {
-        match.metadata[i].metadatable_id = undefined;
-        match.metadata[i].id = undefined;
+    if (Array.isArray(match.lineups)) {
+        for (let i = 0; i < match.lineups.length; i++) {
+            match.lineups[i].id = undefined;
+            match.lineups[i].sport_id = undefined;
+            match.lineups[i].fixture_id = undefined;
+            match.lineups[i].id = undefined;
+            if (match.lineups[i].player != null) {
+                match.lineups[i].player.country_id = undefined;
+                match.lineups[i].player.sport_id = undefined;
+                match.lineups[i].player.city_id = undefined;
+            }
+        }
+    }
+
+    if (Array.isArray(match.events)) {
+        for (let i = 0; i < match.events.length; i++) {
+            match.events[i].fixture_id = undefined;
+            match.events[i].period_id = undefined;
+            match.events[i].section = undefined;
+            match.events[i].section = undefined;
+        }
+    }
+
+    if (Array.isArray(match.statistics)) {
+        for (let i = 0; i < match.statistics.length; i++) {
+            match.statistics[i].fixture_id = undefined;
+        }
+    }
+
+    if (Array.isArray(match.periods)) {
+        for (let i = 0; i < match.periods.length; i++) {
+            match.periods[i].fixture_id = undefined;
+            match.periods[i].started = undefined;
+            match.periods[i].id = undefined;
+            match.periods[i].ended = undefined;
+            match.periods[i].counts_from = undefined;
+            match.periods[i].ticking = undefined;
+            match.periods[i].has_timer = undefined;
+        }
+    }
+
+    if (Array.isArray(match.metadata)) {
+        for (let i = 0; i < match.metadata.length; i++) {
+            match.metadata[i].metadatable_id = undefined;
+            match.metadata[i].id = undefined;
+        }
     }
 
     return match;
 }
-
-
-
-
-
 
 async function fetchRangeTime() {
     await new Promise((resolve, reject) => {
