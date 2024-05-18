@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const cron = require('node-cron');
 const axios = require('axios');
 const zlib = require('zlib');
-const { start } = require('repl');
+const fs = require('fs'); // Import fs module
 
 const TOKEN = process.env.TOKEN;
 dotenv.config();
@@ -22,6 +22,7 @@ var newMargingSelected = false;
 var latest = DateTime.local().setZone('Europe/Rome');
 fetchRangeTime()
 
+
 cron.schedule('*/10 * * * * *', () => {
     if (DateTime.local().setZone('Europe/Rome') > matchTimeStart && keepLive) {
         newMargingSelected = false;
@@ -34,7 +35,7 @@ cron.schedule('*/10 * * * * *', () => {
             differenceArray = [];
             diffSize = false;
         }).catch((error) => {
-            console.error('Errore nell\'aggiornamento dei dati:', error);
+            logError('Errore nell\'aggiornamento dei dati:', error);
         });
     } else {
         countLive = 0;
@@ -48,6 +49,16 @@ cron.schedule('*/10 * * * * *', () => {
             }
         }
     }
+}, {
+    timezone: "Europe/Rome"
+});
+
+cron.schedule('0 3 * * *', () => {
+    fs.writeFile('error.log', '', (err) => {
+        if (err) {
+            logError('Errore nella clean dei log :', err);
+        }
+    });
 }, {
     timezone: "Europe/Rome"
 });
@@ -70,6 +81,7 @@ async function updateTimestampLastCall() {
         .then(response => {
         })
         .catch(error => {
+            logError('Errore nell\'aggiornamento del timestamp (updateTimestampLastCall):', error);
         });
 }
 
@@ -79,7 +91,7 @@ async function saveData(matchHashMap) {
 
     zlib.gzip(jsonData, (err, gzipData) => {
         if (err) {
-            console.error('Errore durante la compressione dei dati:', err);
+            logError('Errore durante la compressione dei dati:', err);
             return;
         }
 
@@ -94,6 +106,7 @@ async function saveData(matchHashMap) {
             .then(response => {
             })
             .catch(error => {
+                logError('Errore nel salvataggio dei dati:', error);
             });
     })
 }
@@ -106,7 +119,7 @@ async function updateLive(dayPlus) {
             const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.local().setZone('Europe/Rome').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${process.env.TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;lineups.player:common_name,image_path;events;statistics:data,participant_id;periods;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
             request.get({ url }, (error, response, body) => {
                 if (error) {
-                    console.error('Errore nella richiesta HTTP:', error);
+                    logError('Errore nella richiesta HTTP:', error);
                     reject(error);
                 } else {
                     const result = JSON.parse(response.body);
@@ -134,7 +147,6 @@ async function updateLive(dayPlus) {
     return matchHashMap;
 }
 
-
 var endTime = false;
 
 async function setRangeTime(dayPlus) {
@@ -149,7 +161,7 @@ async function setRangeTime(dayPlus) {
                     const url = `https://api.sportmonks.com/v3/football/fixtures/date/${DateTime.local().setZone('Europe/Rome').plus({ days: dayPlus }).toFormat('yyyy-MM-dd')}?api_token=${process.env.TOKEN}&include=round:name;league:id;coaches:common_name,image_path;coaches;league:id;participants;scores;venue:name,capacity,image_path,city_name;state;lineups.player:common_name,image_path;events;comments;lineups.player:common_name,image_path;events;comments;statistics:data,participant_id;periods:time_added;metadata;&filters=fixtureLeagues:384,387,564,462,72,82,301,8,2;MetaDataTypes:159,161,162;fixtureStatisticTypes:54,86,45,41,56,42,39,51,34,80,58,57&page=${i}&timezone=Europe/Rome`;
                     request.get({ url }, (error, response, body) => {
                         if (error) {
-                            console.error('Errore nella richiesta HTTP:', error);
+                            logError('Errore nella richiesta HTTP:', error);
                             reject(error);
                         } else {
                             const result = JSON.parse(response.body);
@@ -207,14 +219,14 @@ async function setRangeTime(dayPlus) {
                                 diffSize = false;
                             })
                                 .catch((error) => {
-                                    console.error('Errore nell\'aggiornamento dei dati:', error);
+                                    logError('Errore nell\'aggiornamento dei dati:', error);
                                 });
                         }).catch((error) => {
-                            console.error('Errore nell\'aggiornamento dei dati:', error);
+                            logError('Errore nell\'aggiornamento dei dati:', error);
                         });
                 })
                 .catch(error => {
-                    console.error('ERRORE');
+                    logError('Errore nel salvataggio del range di tempo:', error);
                 });
         });
     });
@@ -338,7 +350,7 @@ async function fetchRangeTime() {
         const url = process.env.RANGEURL;
         request.get({ url }, (error, response, body) => {
             if (error) {
-                console.error('Errore nella richiesta HTTP:', error);
+                logError('Errore nella richiesta HTTP:', error);
                 reject(error);
             } else {
                 const result = JSON.parse(response.body);
@@ -350,3 +362,11 @@ async function fetchRangeTime() {
     });
 }
 
+function logError(message, error) {
+    const errorMessage = `${DateTime.local().setZone('Europe/Rome').toISO()} - ${message} ${error}\n`;
+    fs.appendFile('error.log', errorMessage, (err) => {
+        if (err) {
+            console.error('Errore durante il salvataggio del log:', err);
+        }
+    });
+}
