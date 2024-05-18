@@ -44,7 +44,7 @@ cron.schedule('*/10 * * * * *', () => {
                 setRangeTime(0);
                 updateTimestampLastCall();
             } else {
-                setRangeTime(0);
+                setRangeTime(1);
                 updateTimestampLastCall();
             }
         }
