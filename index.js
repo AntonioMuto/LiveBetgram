@@ -43,7 +43,7 @@ cron.schedule('*/10 * * * * *', () => {
                 setRangeTime(0);
                 updateTimestampLastCall();
             } else {
-                setRangeTime(1);
+                setRangeTime(0);
                 updateTimestampLastCall();
             }
         }
@@ -179,7 +179,7 @@ async function setRangeTime(dayPlus) {
                 });
             }
         })().then(() => {
-            const url = process.env.RANGEURL;
+            const urlrange = process.env.RANGEURL;
             let jsonData = { "match": "NESSUNO" };
             orarioFine = orarioFine.plus({ hours: 2, minutes: 20 });
             if (nessunMatch === false) {
@@ -190,7 +190,7 @@ async function setRangeTime(dayPlus) {
                     'Content-Type': 'application/json'
                 }
             };
-            axios.put(url, jsonData, config)
+            axios.put(urlrange, jsonData, config)
                 .then(response => {
                     keepLive = true;
                     newMargingSelected = true;
