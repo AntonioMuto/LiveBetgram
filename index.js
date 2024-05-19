@@ -103,7 +103,6 @@ async function saveData(matchHashMap) {
 
         axios.put(url, gzipData, config)
             .then(response => {
-                console.log("updated");
             })
             .catch(error => {
                 logError('Errore nel salvataggio dei dati:', error);
