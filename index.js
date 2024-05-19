@@ -41,10 +41,10 @@ cron.schedule('*/10 * * * * *', () => {
         countLive = 0;
         if (newMargingSelected == false) {
             if (DateTime.local().setZone('Europe/Rome').day !== todayDay) {
-                setRangeTime(1);
+                setRangeTime(0);
                 updateTimestampLastCall();
             } else {
-                setRangeTime(0);
+                setRangeTime(1);
                 updateTimestampLastCall();
             }
         }
@@ -207,7 +207,7 @@ async function setRangeTime(dayPlus) {
                     keepLive = true;
                     newMargingSelected = true;
                     let dayCheck = 0;
-                    dayPlus == 0 ? dayCheck = 1 : dayCheck = 0;
+                    dayPlus === 0 ? dayCheck = 1 : dayCheck = 0;
                     const updMatchUrl = `http://${process.env.APIBETGRAM}/api/insert/match/${DateTime.local().setZone('Europe/Rome').minus({ days: dayCheck }).toFormat('yyyy-MM-dd')}`;
                     axios.get(updMatchUrl)
                         .then((response) => {
