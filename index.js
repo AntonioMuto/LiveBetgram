@@ -317,9 +317,19 @@ function refineResponse(match) {
     }
 
     if (Array.isArray(match.statistics)) {
-        for (let i = 0; i < match.statistics.length; i++) {
-            match.statistics[i].fixture_id = undefined;
-        }
+        const result = match.statistics.reduce((acc, stat) => {
+            let type = acc.find(item => item._id === stat.type_id);
+        
+            if (!type) {
+                type = { _id: stat.type_id, stats: [] };
+                acc.push(type);
+            }
+        
+            type.stats.push({ data: { value: stat.data.value }, participant_id: stat.participant_id });
+        
+            return acc;
+        }, []);
+        match.statistics = result;
     }
 
     if (Array.isArray(match.periods)) {
