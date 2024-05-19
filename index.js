@@ -53,8 +53,8 @@ cron.schedule('*/10 * * * * *', () => {
     timezone: "Europe/Rome"
 });
 
-cron.schedule('0 3 * * *', () => {
-    fs.writeFile('error.log', '', (err) => {
+cron.schedule(' * * */72 * * *', () => {
+    fs.writeFile('error.log', `ultima clean - ${DateTime.local().setZone('Europe/Rome')}`, (err) => {
         if (err) {
             logError('Errore nella clean dei log :', err);
         }
