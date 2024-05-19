@@ -165,7 +165,6 @@ async function setRangeTime(dayPlus) {
                             reject(error);
                         } else {
                             const result = JSON.parse(response.body);
-                            console.log(result);
                             for (var match of result.data || []) {
                                 nessunMatch = false;
                                 const dataLuxon = DateTime.fromFormat(match.starting_at, formatoInput);
