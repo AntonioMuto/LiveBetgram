@@ -88,7 +88,6 @@ async function updateTimestampLastCall() {
 async function saveData(matchHashMap) {
     const url = process.env.LIVEURL;
     const jsonData = JSON.stringify(matchHashMap);
-
     zlib.gzip(jsonData, (err, gzipData) => {
         if (err) {
             logError('Errore durante la compressione dei dati:', err);
@@ -104,6 +103,7 @@ async function saveData(matchHashMap) {
 
         axios.put(url, gzipData, config)
             .then(response => {
+                console.log("updated");
             })
             .catch(error => {
                 logError('Errore nel salvataggio dei dati:', error);
