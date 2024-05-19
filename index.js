@@ -41,10 +41,10 @@ cron.schedule('*/10 * * * * *', () => {
         countLive = 0;
         if (newMargingSelected == false) {
             if (DateTime.local().setZone('Europe/Rome').day !== todayDay) {
-                setRangeTime(0);
+                setRangeTime(1);
                 updateTimestampLastCall();
             } else {
-                setRangeTime(1);
+                setRangeTime(0);
                 updateTimestampLastCall();
             }
         }
